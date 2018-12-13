@@ -1,25 +1,37 @@
 {
-  "name": "react-machine-learning",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
-    "react-scripts": "2.1.1"
-  },
+  "name": "rml-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "server": "nodemon index.js",
+    "client": "npm run start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flameheadsg/react-machine-learning.git"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/flameheadsg/react-machine-learning/issues"
+  },
+  "homepage": "https://github.com/flameheadsg/react-machine-learning#readme",
+  "dependencies": {
+    "@tensorflow/tfjs-node": "^0.1.21",
+    "body-parser": "^1.18.3",
+    "concurrently": "^4.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "lodash": "^4.17.11",
+    "memoize": "^0.1.1",
+    "mnist-data": "^1.2.6",
+    "mongoose": "^5.3.16",
+    "morgan": "^1.9.1",
+    "nodemon": "^1.18.8",
+    "shuffle-seed": "^1.1.6"
+  }
 }
