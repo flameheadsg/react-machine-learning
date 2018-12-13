@@ -34,27 +34,35 @@ export default class KnnScreen extends Component {
     return (
       <div style={styles.main}>
         <h2>K-Nearest-Neighbor (KNN)</h2>
-        <hr /><br />
+        <hr />
+        <p style={{fontSize: "22px"}}>
+          {
+            "The K-Nearest-Neighbor algorithm makes predictions by averaging " +
+            'the values of the "k" closest points in a data set. Below you can ' +
+            'experiment with different test set sizes (out of 50 records total) ' +
+            'and different values of "k."'
+          }
+        </p>
         <div style={{display: "flex", justifyContent: "center"}}>
-          <p>Size of Test Set:&nbsp;&nbsp;</p>
+          <p>Size of Test Set:&nbsp;&nbsp;&nbsp;&nbsp;</p>
           <input
             value={this.state.testSize}
             onChange={this.handleTestSize}
-            style={{fontSize: "16px"}}
+            style={{fontSize: "16px", paddingLeft: 10}}
           />
         </div>
         <br />
         <div style={{display: "flex", justifyContent: "center"}}>
-          <p>Value of K:&nbsp;&nbsp;</p>
+          <p>Value of K:&nbsp;&nbsp;&nbsp;&nbsp;</p>
           <input
             value={this.state.k}
             onChange={this.handleK}
-            style={{fontSize: "16px"}}
+            style={{fontSize: "16px", paddingLeft: 10}}
           />
         </div>
         <br /><br />
         <button onClick={this.knn} style={{transform: "scale(1.6)"}}>
-          Run KNN Algorithm
+          Test KNN
         </button>
       </div>
     );
