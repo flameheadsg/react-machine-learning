@@ -1,11 +1,11 @@
 .knn-btn {
-  color: rgb(0, 23, 198);
+  color: rgb(0, 27, 239);
   background-color: white;
   padding: 25px;
   width: 200px;
   display: inline-block;
   font-size: 20px;
-  border: 2px solid rgb(0, 23, 198);
+  border: 2px solid rgb(0, 27, 239);
   border-radius: 10px;
   margin: 25px;
 }
@@ -25,6 +25,5 @@
   100% {
     transform: scale(1.08);
     background-color: rgb(246, 246, 250);
-    color: rgb(72, 37, 188);
   }
 }

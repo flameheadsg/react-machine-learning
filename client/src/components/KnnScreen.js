@@ -27,7 +27,7 @@ export default class KnnScreen extends Component {
 
   async knn() {
     this.setState({ loading: true });
-    let res = await axios.post('http://localhost:5000/api/knn/', {
+    let res = await axios.post('/api/knn/', {
       testSetSize: parseInt(this.state.testSetSize),
       k: parseInt(this.state.k)
     });
