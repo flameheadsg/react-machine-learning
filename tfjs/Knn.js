@@ -1,6 +1,5 @@
 require('@tensorflow/tfjs-node');
 const tf = require('@tensorflow/tfjs');
-const loadCSV = require('./load-csv');
 const features = require('./data/knnFeatures')
 const labels = require('./data/knnLabels')
 const shuffleSeed = require('shuffle-seed')

@@ -87,19 +87,19 @@ export default class KnnScreen extends Component {
           Below, you will be able to experiment with the KNN algorithm yourself using data collected
           {" from 500 randomly sampled houses. We are going to make the assumption that a house's "}
           # of bedrooms, # of bathrooms, # of floors and # of square feet all significantly impact
-          {" it's price on the market. We will then use these features to make predictions "}
-          about the data we already collected, and compare our predictions to the actual values in
-          order to gauge the accuracy of our algorithm.
+          its price on the market. Using these independent variables, we will make predictions for random houses
+          using KNN and compare our predictions to their actual prices. This will help us gauge how accurate
+          our algorithm really is.
         </p>
         <p style={styles.text}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          The test set size will determine <strong>how many prices we predict with the algorithm. </strong>
+          The test set size will determine <strong>how many predictions we make</strong> to test our algorithm with.
           A test set size of 1 will return the statistics for
-          {" just a single house's prediction, so a larger test set is necessary for our algorithm's"}
+          {" just a single house's prediction, so a larger test set is necessary for our algorithm's "}
           descriptive statistics to be meaningful. Keep in mind that
           larger test sets will take more time for the server to process. The test set is
-          not taken into consideration when gauging accuracy, so a size of 10 would tell our
-          algorithm to randomly separate 10 houses from the data and make predictions for each one
-          using the remaining 490 data points, known as the training set.
+          not taken into consideration when analyzing the data, so a size of 10 would tell our
+          algorithm to randomly separate 10 houses from the data set and make predictions for each one
+          of the 10 house using the remaining 490 data points, referred to as the training set.
         </p><br /><br />
         <div style={{display: "flex", justifyContent: "center"}}>
           <p style={{fontSize: "20px"}}>Size of Test Set:&nbsp;&nbsp;&nbsp;&nbsp;</p>
@@ -111,7 +111,7 @@ export default class KnnScreen extends Component {
         </div><br />
         <p style={styles.text}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           The value of K determines <strong>how many similar houses are taken into consideration</strong>
-          {" when predicting a house's price. A k-value of 1 would simply give you the price of the most "}
+          {" while predicting a house's price. A k-value of 1 would simply give you the price of the most "}
           similar house in the training set, while setting K equal to the size of the training set would give you the
           average price of all houses. Think of K as how liberal you want to be when making a prediction, and experiment
           with different k-values for different test set sizes to see how your results change.
