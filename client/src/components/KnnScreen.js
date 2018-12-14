@@ -49,7 +49,7 @@ export default class KnnScreen extends Component {
             {this.state.stddev.toFixed(5)}%
           </div><br />
           <div style={styles.results}><strong>Most accurate prediction:</strong><br /><br />{this.state.max.toFixed(5)}%</div>
-          <br /><br /><br /><hr />
+          <br /><br /><br /><br /><hr />
         </div>
       );
     }
