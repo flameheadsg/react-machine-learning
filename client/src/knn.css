@@ -1,0 +1,30 @@
+.knn-btn {
+  color: rgb(0, 23, 198);
+  background-color: white;
+  padding: 25px;
+  width: 200px;
+  display: inline-block;
+  font-size: 20px;
+  border: 2px solid rgb(0, 23, 198);
+  border-radius: 10px;
+  margin: 25px;
+}
+
+.knn-btn:hover {
+  background-color: rgb(240, 240, 240);
+  cursor: pointer;
+  animation-name: grow;
+  animation-duration: 0.2s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes grow {
+  0% {
+  }
+
+  100% {
+    transform: scale(1.08);
+    background-color: rgb(246, 246, 250);
+    color: rgb(72, 37, 188);
+  }
+}

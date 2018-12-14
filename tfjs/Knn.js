@@ -3,31 +3,37 @@ const tf = require('@tensorflow/tfjs');
 const loadCSV = require('./load-csv');
 const features = require('./data/knnFeatures')
 const labels = require('./data/knnLabels')
+const shuffleSeed = require('shuffle-seed')
 
 class Knn {
-  constructor(n = 10) {
-    this.testFeatures = features.slice(0, n);
-    this.testLabels = labels.slice(0, n);
-    this.trainFeatures = tf.tensor(features.slice(n));
-    this.trainLabels = tf.tensor(labels.slice(n));
+  constructor(n = 10, seed = "random") {
+    const shuffledFeatures = shuffleSeed.shuffle(features, seed);
+    const shuffledLabels = shuffleSeed.shuffle(labels, seed);
+    this.testFeatures = shuffledFeatures.slice(0, n);
+    this.testLabels = shuffledLabels.slice(0, n);
+    this.trainFeatures = tf.tensor(shuffledFeatures.slice(n));
+    this.trainLabels = tf.tensor(shuffledLabels.slice(n));
   }
 
   test(k) {
-    let sum = 0;
+    let accuracies = [];
+    let max = 0;
     let { length } = this.testFeatures;
 
     this.testFeatures.forEach((testPoint, i) => {
       const result = this.knn(this.trainFeatures, this.trainLabels, tf.tensor(testPoint), k);
-      const err = (this.testLabels[i][0] - result) / this.testLabels[i][0] * 100;
-      console.log("Error:", err, "%");
-      err > 0 ? sum += err : sum -= err;
+      const accuracy = 100 - Math.abs((this.testLabels[i][0] - result) / this.testLabels[i][0] * 100);
+      accuracies.push(accuracy);
+      if (accuracy > max) { max = accuracy }
     });
 
-    console.log(
-      "\nAverage Error with test size of",
-      length, "and k of", k + ":\n",
-      (sum / length), "%\n"
-    );
+    let { mean, variance } = tf.moments(tf.tensor(accuracies));
+    let vals1 = mean.dataSync();
+    let vals2 = variance.dataSync();
+    let avg = Array.from(vals1)[0];
+    let stddev = Math.pow(Array.from(vals2)[0], 0.5);
+
+    return { mean: avg, stddev, max };
   }
 
   knn(features, labels, predictionPoint, k) {

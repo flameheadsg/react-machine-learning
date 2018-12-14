@@ -15,14 +15,16 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.get('/', async (req, res) => {
+app.get('/api/', async (req, res) => {
   res.send({ success: "true" });
 });
 
-app.post('/knn/', async (req, res) => {
-  let { testSize, k } = req.body;
-  let knn = new Knn(testSize);
-  knn.test(k);
+app.post('/api/knn/', async (req, res) => {
+  let { testSetSize, k } = req.body;
+  let knn = new Knn(testSetSize, (testSetSize + k));
+  knn.test(k)
+  let { mean, stddev, max } = knn.test(k);
+  res.send({ mean, stddev, max, resultsTSS: testSetSize, resultsK: k });
 });
 
 if (process.env.NODE_ENV === 'production') {
