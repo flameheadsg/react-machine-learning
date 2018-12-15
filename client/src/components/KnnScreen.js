@@ -126,8 +126,9 @@ export default class KnnScreen extends Component {
         <div ref={this.otherRef} style={{textAlign: "center"}}>
           <Result text={
             <div>
-              <strong>Predicted price of house with {this.state.resBeds} beds,&nbsp;
-              {this.state.resBaths} baths, {this.state.resFloors} floors
+              <strong>Predicted price of house with {this.state.resBeds} {(this.state.resBeds > 1 ? "beds" : "bed")},&nbsp;
+              {this.state.resBaths} {(this.state.resBaths > 1 ? "baths" : "bath")},&nbsp;
+              {this.state.resFloors} {(this.state.resFloors > 1 ? "floors" : "floor")}&nbsp;
               and {this.state.resSqft} sqft. using a k-value of {this.state.resK}:</strong><br /><br />
               {this.toDollars(this.state.price.toFixed(2))}
             </div>
