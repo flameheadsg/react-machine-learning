@@ -16,21 +16,101 @@ export default class KnnScreen extends Component {
       mean: 0,
       stddev: 0,
       max: 0,
-      loading: false
+      loading: false,
+      sqft: 0,
+      beds: 0,
+      baths: 0,
+      floors: 0,
+      testK: 0,
+      price: 0,
+      resBeds: 0,
+      resBaths: 0,
+      resFloors: 0,
+      resSqft: 0,
+      resK: 0
     };
 
     this.myRef = React.createRef();
+    this.otherRef = React.createRef();
     this.knn = this.knn.bind(this);
     this.handleTestSetSize = this.handleTestSetSize.bind(this);
     this.handleK = this.handleK.bind(this);
-    this.renderErrors = this.renderErrors.bind(this);
+    this.renderAccuracies = this.renderAccuracies.bind(this);
     this.showResults = this.showResults.bind(this);
+    this.handleSqft = this.handleSqft.bind(this);
+    this.handleBeds = this.handleBeds.bind(this);
+    this.handleBaths = this.handleBaths.bind(this);
+    this.handleFloors = this.handleFloors.bind(this);
+    this.handleTestK = this.handleTestK.bind(this);
+    this.predict = this.predict.bind(this);
+    this.showPrediction = this.showPrediction.bind(this);
+    this.renderPrediction = this.renderPrediction.bind(this);
+    this.toDollars = this.toDollars.bind(this);
+  }
+
+  toDollars(amount) {
+    return "$" + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  async predict() {
+    if (
+      !this.state.loading &&
+      this.state.beds > 0 &&
+      this.state.baths > 0 &&
+      this.state.floors > 0 &&
+      this.state.sqft > 0 &&
+      this.state.testK > 0
+    ) {
+      this.setState({ loading: true });
+      let res = await axios.post('/api/knn/predict/', {
+        beds: parseInt(this.state.beds),
+        baths: parseInt(this.state.baths),
+        floors: parseInt(this.state.floors),
+        sqft: parseInt(this.state.sqft),
+        k: parseInt(this.state.testK)
+      });
+      console.log(res.data);
+      let {
+        price,
+        resBeds,
+        resBaths,
+        resFloors,
+        resSqft,
+        resK
+      } = res.data;
+      this.setState({
+        price,
+        resBeds,
+        resBaths,
+        resFloors,
+        resSqft,
+        resK,
+        loading: false
+      },
+      () => this.showPrediction());
+    } else {
+      window.alert("Please insert values greater than 0 to predict price with.")
+    }
   }
 
   async knn() {
-    if (!this.state.loading) {
+    if (this.state.testSetSize <= 0) {
+      window.alert("Please select a test set size greater than 0.");
+    } else if (this.state.testSetSize >= 500) {
+      window.alert("Please select a test set size less than 500.");
+      return;
+    }
+
+    if (this.state.k <= 0) {
+      window.alert("Please select a k-value greater than 0.");
+    } else if (this.state.k >= 500) {
+      window.alert("Please select a k-value less than 500.");
+      return;
+    }
+
+    if (!this.state.loading && this.state.k > 0 && this.state.testSetSize > 0) {
       this.setState({ loading: true });
-      let res = await axios.post('/api/knn/', {
+      let res = await axios.post('/api/knn/train/', {
         testSetSize: parseInt(this.state.testSetSize),
         k: parseInt(this.state.k)
       });
@@ -40,11 +120,29 @@ export default class KnnScreen extends Component {
     }
   }
 
-  renderErrors() {
-    if (this.state.mean > 0) {
+  renderPrediction() {
+    if (this.state.resK > 0) {
+      return (
+        <div ref={this.otherRef} style={{textAlign: "center"}}>
+          <Result text={
+            <div>
+              <strong>Predicted price of house with {this.state.resBeds} beds,&nbsp;
+              {this.state.resBaths} baths, {this.state.resFloors} floors
+              and {this.state.resSqft} sqft. using a k-value of {this.state.resK}:</strong><br /><br />
+              {this.toDollars(this.state.price.toFixed(2))}
+            </div>
+          }/>
+          <br /><br /><br /><br /><hr />
+        </div>
+      );
+    }
+  }
+
+  renderAccuracies() {
+    if (this.state.resultsK > 0) {
       return (
         <div ref={this.myRef} style={{textAlign: "center"}}>
-          <Result callback={this.showResults} text={
+          <Result text={
             <div>
               <strong>Average accuracy of KNN algorithm with test set size of {this.state.resultsTSS}&nbsp;
               and k-value of {this.state.resultsK}:</strong><br /><br />{this.state.mean.toFixed(5)}%
@@ -74,12 +172,39 @@ export default class KnnScreen extends Component {
     });
   }
 
+  showPrediction() {
+    window.scrollTo({
+      top: this.otherRef.current.offsetTop,
+      behavior: "smooth"
+    });
+  }
+
   handleTestSetSize(e) {
     this.setState({ testSetSize: e.target.value });
   }
 
   handleK(e) {
     this.setState({ k: e.target.value });
+  }
+
+  handleSqft(e) {
+    this.setState({ sqft: e.target.value });
+  }
+
+  handleBeds(e) {
+    this.setState({ beds: e.target.value });
+  }
+
+  handleBaths(e) {
+    this.setState({ baths: e.target.value });
+  }
+
+  handleFloors(e) {
+    this.setState({ floors: e.target.value });
+  }
+
+  handleTestK(e) {
+    this.setState({ testK: e.target.value });
   }
 
   render() {
@@ -92,7 +217,7 @@ export default class KnnScreen extends Component {
           The K-Nearest-Neighbor (KNN) algorithm makes predictions about some point by
           averaging the values of the "k" closest points in a data set. The image
           above provides a graphical depiction. The logic is based around the notion
-          that "birds of a feather flock together," so it makes sense to look at surrounding
+          that "birds of a feather flock together," so it makes sense to look at nearby
           data points when making a prediction.
         </p>
         <p style={styles.text}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -111,7 +236,7 @@ export default class KnnScreen extends Component {
           larger test sets will take more time for the server to process. The test set is
           not taken into consideration when analyzing the data, so a size of 10 would tell our
           algorithm to randomly separate 10 houses from the data set and make predictions for each one
-          of the 10 house using the remaining 490 data points, referred to as the training set.
+          of the 10 houses using the remaining 490 data points, referred to as the training set.
         </p><br /><br />
         <div style={{display: "flex", justifyContent: "center"}}>
           <p style={{fontSize: "20px"}}>Size of Test Set:&nbsp;&nbsp;&nbsp;&nbsp;</p>
@@ -148,7 +273,67 @@ export default class KnnScreen extends Component {
             "Test KNN"
           )}
         </div><br /><br /><hr /><br />
-        {this.renderErrors()}
+        {this.renderAccuracies()}
+        <p style={styles.text}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          You can use the results for different k-values and test set sizes to find an optimal
+          value for K. One should look for higher mean accuracies and lower standard deviations, which measures
+          how widely distributed a data set is. Higher means and lower standard deviations tell us that at those
+          values of K the predictions made using the test set were both accurate and consistent. Below you can plug in
+          any combination of bedrooms, bathrooms, floors, and square feet and use your optimized K to predict
+          the price of a house with your chosen characteristics using KNN.
+        </p><br /><br />
+        <div style={{display: "flex", justifyContent: "flex-end", position: "relative", right: 350}}>
+          <p style={{fontSize: "20px"}}># of Bedrooms:&nbsp;&nbsp;&nbsp;&nbsp;</p>
+          <input
+            value={this.state.beds}
+            onChange={this.handleBeds}
+            style={{fontSize: "16px", paddingLeft: 10}}
+          />
+        </div><br /><br />
+        <div style={{display: "flex", justifyContent: "flex-end", position: "relative", right: 350}}>
+          <p style={{fontSize: "20px"}}># of Bathrooms:&nbsp;&nbsp;&nbsp;&nbsp;</p>
+          <input
+            value={this.state.baths}
+            onChange={this.handleBaths}
+            style={{fontSize: "16px", paddingLeft: 10}}
+          />
+        </div><br /><br />
+        <div style={{display: "flex", justifyContent: "flex-end", position: "relative", right: 350}}>
+          <p style={{fontSize: "20px"}}># of Floors:&nbsp;&nbsp;&nbsp;&nbsp;</p>
+          <input
+            value={this.state.floors}
+            onChange={this.handleFloors}
+            style={{fontSize: "16px", paddingLeft: 10}}
+          />
+        </div><br /><br />
+        <div style={{display: "flex", justifyContent: "flex-end", position: "relative", right: 350}}>
+          <p style={{fontSize: "20px"}}># of Square Feet:&nbsp;&nbsp;&nbsp;&nbsp;</p>
+          <input
+            value={this.state.sqft}
+            onChange={this.handleSqft}
+            style={{fontSize: "16px", paddingLeft: 10}}
+          />
+        </div><br /><br />
+        <div style={{display: "flex", justifyContent: "flex-end", position: "relative", right: 350}}>
+          <p style={{fontSize: "20px"}}>K:&nbsp;&nbsp;&nbsp;&nbsp;</p>
+          <input
+            value={this.state.testK}
+            onChange={this.handleTestK}
+            style={{fontSize: "16px", paddingLeft: 10}}
+          />
+        </div><br /><br />
+        <div onClick={this.predict} className="knn-btn">
+          {(this.state.loading ?
+            <div>
+              <p>Running Algorithm</p>
+              <div style={{display: "inline-block"}}>
+                <ReactLoading type={"bars"} color={"#fff"} height={30} width={30} />
+              </div>
+            </div> :
+            "Predict Price"
+          )}
+        </div><br /><br /><hr /><br />
+        {this.renderPrediction()}
       </div>
     );
   }

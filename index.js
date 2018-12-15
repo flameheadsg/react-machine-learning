@@ -19,12 +19,33 @@ app.get('/api/', async (req, res) => {
   res.send({ success: "true" });
 });
 
-app.post('/api/knn/', async (req, res) => {
+app.post('/api/knn/train/', async (req, res) => {
   let { testSetSize, k } = req.body;
   let knn = new Knn(testSetSize, Math.random());
-  knn.test(k)
-  let { mean, stddev, max } = knn.test(k);
+  let { mean, stddev, max } = knn.train(k);
   res.send({ mean, stddev, max, resultsTSS: testSetSize, resultsK: k });
+});
+
+app.post('/api/knn/predict/', async (req, res) => {
+  let { beds, baths, floors, sqft, k } = req.body;
+  let knn = new Knn(0);
+  let {
+    price,
+    closest,
+    resBeds,
+    resBaths,
+    resFloors,
+    resSqft
+  } = knn.predict(beds, baths, floors, sqft, k);
+  res.send({
+    price,
+    closest,
+    resBeds,
+    resBaths,
+    resFloors,
+    resSqft,
+    resK: k
+  });
 });
 
 if (process.env.NODE_ENV === 'production') {
