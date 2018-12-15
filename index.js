@@ -21,7 +21,7 @@ app.get('/api/', async (req, res) => {
 
 app.post('/api/knn/', async (req, res) => {
   let { testSetSize, k } = req.body;
-  let knn = new Knn(testSetSize, (testSetSize + k));
+  let knn = new Knn(testSetSize, Math.random());
   knn.test(k)
   let { mean, stddev, max } = knn.test(k);
   res.send({ mean, stddev, max, resultsTSS: testSetSize, resultsK: k });

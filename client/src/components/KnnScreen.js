@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import '../knn.css';
 import axios from 'axios';
+import ReactLoading from 'react-loading';
+import Result from './Result';
 
 export default class KnnScreen extends Component {
   constructor(props) {
@@ -26,29 +28,39 @@ export default class KnnScreen extends Component {
   }
 
   async knn() {
-    this.setState({ loading: true });
-    let res = await axios.post('/api/knn/', {
-      testSetSize: parseInt(this.state.testSetSize),
-      k: parseInt(this.state.k)
-    });
-    let { mean, stddev, max, resultsTSS, resultsK } = res.data;
-    this.setState({ mean, stddev, max, resultsTSS, resultsK, loading: false });
-    this.showResults();
+    if (!this.state.loading) {
+      this.setState({ loading: true });
+      let res = await axios.post('/api/knn/', {
+        testSetSize: parseInt(this.state.testSetSize),
+        k: parseInt(this.state.k)
+      });
+      let { mean, stddev, max, resultsTSS, resultsK } = res.data;
+      this.setState({ mean, stddev, max, resultsTSS, resultsK, loading: false },
+      () => this.showResults());
+    }
   }
 
   renderErrors() {
-    if (this.state.stddev > 0) {
+    if (this.state.mean > 0) {
       return (
         <div ref={this.myRef} style={{textAlign: "center"}}>
-          <div style={styles.results}>
-            <strong>Average accuracy of KNN algorithm with test set size of {this.state.resultsTSS}&nbsp;
-            and k-value of {this.state.resultsK}:</strong><br /><br />{this.state.mean.toFixed(5)}%
-          </div><br />
-          <div style={styles.results}>
-            <strong>Standard deviation of accuracy among predictions:</strong><br /><br />
-            {this.state.stddev.toFixed(5)}%
-          </div><br />
-          <div style={styles.results}><strong>Most accurate prediction:</strong><br /><br />{this.state.max.toFixed(5)}%</div>
+          <Result callback={this.showResults} text={
+            <div>
+              <strong>Average accuracy of KNN algorithm with test set size of {this.state.resultsTSS}&nbsp;
+              and k-value of {this.state.resultsK}:</strong><br /><br />{this.state.mean.toFixed(5)}%
+            </div>
+          }/>
+          <Result text={
+            <div>
+              <strong>Standard deviation of accuracy among predictions:</strong><br /><br />
+              {this.state.stddev.toFixed(5)}%
+            </div>
+          }/><br />
+          <Result text={
+            <div>
+              <strong>Most accurate prediction:</strong><br /><br />{this.state.max.toFixed(5)}%
+            </div>
+          }/>
           <br /><br /><br /><br /><hr />
         </div>
       );
@@ -126,7 +138,15 @@ export default class KnnScreen extends Component {
         </div>
         <br /><br />
         <div onClick={this.knn} className="knn-btn">
-          {( this.state.loading ? "Running Algorithm..." : "Test KNN")}
+          {(this.state.loading ?
+            <div>
+              <p>Running Algorithm</p>
+              <div style={{display: "inline-block"}}>
+                <ReactLoading type={"bars"} color={"#fff"} height={30} width={30} />
+              </div>
+            </div> :
+            "Test KNN"
+          )}
         </div><br /><br /><hr /><br />
         {this.renderErrors()}
       </div>
@@ -150,15 +170,5 @@ const styles = {
     maxWidth: 850,
     display: "inline-block",
     textAlign: "justify"
-  },
-  results: {
-    display: "inline-block",
-    padding: 25,
-    marginTop: 40,
-    borderRadius: 10,
-    maxWidth: 560,
-    color: "white",
-    backgroundColor: "rgb(0, 64, 124)",
-    fontSize: 20
   }
 };
